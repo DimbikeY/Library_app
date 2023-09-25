@@ -1,10 +1,16 @@
 package dolmatov.models;
 
+import jakarta.validation.constraints.*;
+
 public class Book {
     // Перегруженные пустые методы для того, чтобы можно было создавать ModelAttribute с 0 значениями + id значение = 0
     private int id;
+    @NotEmpty(message = "You name should have consisted of >0 characters")
     private String name;
+    @NotEmpty(message = "You name is empty")
     private String author;
+    @Min(value = 1900, message = "You can't be so old!")
+    @Max(value = 2023, message = "This year hasn't passed")
     private int year;
     private int personId;
 

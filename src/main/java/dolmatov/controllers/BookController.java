@@ -1,8 +1,8 @@
 package dolmatov.controllers;
 
 import dolmatov.dao.BookDAO;
+import dolmatov.dao.PersonDAO;
 import dolmatov.models.Book;
-import dolmatov.utils.BookValidator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/books")
 public class BookController {
     private BookDAO bookDAO;
-    private BookValidator bookValidator;
-
+    private PersonDAO personDAO;
     @Autowired
-    public BookController(BookDAO bookDAO, BookValidator bookValidator) {
+    public BookController(BookDAO bookDAO, PersonDAO personDAO) {
         this.bookDAO = bookDAO;
-        this.bookValidator = bookValidator;
+        this.personDAO = personDAO;
     }
 
     @GetMapping()
@@ -34,6 +33,7 @@ public class BookController {
                           Model model){
         // Получим одного через переменную пути -> запрос к БД -> засунем в модель и на представление
         model.addAttribute("book", bookDAO.getBook(id));
+        model.addAttribute("people", personDAO.getPeople());
         return "books/book";
     }
 

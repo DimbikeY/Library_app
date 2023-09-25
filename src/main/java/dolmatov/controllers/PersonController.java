@@ -68,11 +68,10 @@ public class PersonController {
                               @ModelAttribute("person") @Valid Person person,
                               BindingResult bindingResult) {
         personValidator.validate(person, bindingResult);
-        // Реализовать, что делать, если он не меняет значение, но оно у него есть
+        // Реализовать, что делать, если не изменяем вальдируемое на уникальность поле, на которое триггерится валидатор
         if(bindingResult.hasErrors()){
             return "people/editPerson";
         }
-
         personDAO.editPerson(person, id);
         return "redirect:/people";
     }

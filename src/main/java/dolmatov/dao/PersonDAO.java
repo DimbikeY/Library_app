@@ -26,11 +26,11 @@ public class PersonDAO {
     }
 
     public List<Person> getPeople() {
-        jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
+        return jdbcTemplate.query("SELECT * FROM Person", new BeanPropertyRowMapper<>(Person.class));
     }
 
     public Person getPerson(int id) {
-        jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new BeanPropertyRowMapper<>(Person.class), id);
+        return jdbcTemplate.query("SELECT * FROM Person WHERE id=?", new BeanPropertyRowMapper<>(Person.class), id).stream().findAny().orElse(null);
     }
 
     public void editPerson(Person person, int id) {
