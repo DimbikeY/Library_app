@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Person info</title>
@@ -8,8 +8,17 @@
 <div th:text="${person.getName() + ', ' + person.getYear()}"/>
 <br/>
 <br/>
+<div th:if="${bookFromPerson.isEmpty()}">
+    This person hasn't taken any books!
+</div>
 <hr/>
-
+<div th:if="${bookFromPerson.size() > 0}">
+    <p>Books:</p>
+    <div th:each="book: ${bookFromPerson}">
+        <span th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}">VALUE</span>
+    </div>
+</div>
+<hr/>
 <form method="GET" th:action="@{/people/{id}/edit(id=${person.getId()})}" th:object="${person}">
     <input type="submit" value="Edit this person!">
 </form>

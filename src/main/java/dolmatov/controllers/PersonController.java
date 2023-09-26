@@ -1,5 +1,6 @@
 package dolmatov.controllers;
 
+import dolmatov.dao.BookDAO;
 import dolmatov.dao.PersonDAO;
 import dolmatov.models.Person;
 import dolmatov.utils.PersonValidator;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/people")
 public class PersonController {
+    private BookDAO bookDAO;
     private PersonDAO personDAO;
     private PersonValidator personValidator;
     @Autowired
-    public PersonController(PersonDAO personDAO, PersonValidator personValidator) {
+    public PersonController(PersonDAO personDAO, PersonValidator personValidator, BookDAO bookDAO) {
         this.personDAO = personDAO;
         this.personValidator = personValidator;
+        this.bookDAO = bookDAO;
     }
 
     @GetMapping()
@@ -33,6 +36,9 @@ public class PersonController {
                             Model model){
         // Получим одного
         model.addAttribute("person", personDAO.getPerson(id));
+        // model.addAttribute("books", bookDAO.getBooks());
+        model.addAttribute("bookFromPerson", bookDAO.getBookFromPerson(id));
+        System.out.println(bookDAO.getBookFromPerson(id).size());
         return "people/person";
     }
 
@@ -83,4 +89,5 @@ public class PersonController {
         personDAO.deletePerson(id, person);
         return "redirect:/people";
     }
+
 }

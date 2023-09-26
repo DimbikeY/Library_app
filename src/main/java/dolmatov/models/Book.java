@@ -9,8 +9,8 @@ public class Book {
     private String name;
     @NotEmpty(message = "You name is empty")
     private String author;
-    @Min(value = 1900, message = "You can't be so old!")
-    @Max(value = 2023, message = "This year hasn't passed")
+    @NotNull(message = "Type a year")
+    @Max(value = 2023, message = "This book can't be made in the future")
     private int year;
     private int personId;
 

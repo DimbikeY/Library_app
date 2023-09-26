@@ -1,5 +1,6 @@
 package dolmatov.dao;
 
+import dolmatov.models.Book;
 import dolmatov.models.Person;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,6 +41,6 @@ public class PersonDAO {
 
     public void deletePerson(int id, Person personToDelete) {
         jdbcTemplate.update("DELETE FROM Person WHERE id=?",
-                personToDelete.getId());
+                id);
     }
 }

@@ -3,12 +3,15 @@ package dolmatov.controllers;
 import dolmatov.dao.BookDAO;
 import dolmatov.dao.PersonDAO;
 import dolmatov.models.Book;
+import dolmatov.models.Person;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/books")
@@ -64,6 +67,8 @@ public class BookController {
     public String patchBook(@PathVariable("id") int id,
                             @ModelAttribute("book") @Valid Book book,
                             BindingResult bindingResult){
+        System.out.println(book.getId());
+        System.out.println(id);
         // обращаюсь к БД после получения html формы от editPerson
         if(bindingResult.hasErrors()){
             return "books/editBook";
@@ -78,5 +83,25 @@ public class BookController {
         // Обращаемся сразу к DAO
         bookDAO.deleteBook(id, book);
         return "redirect:/books";
+    }
+
+    @PatchMapping("/attach/{id}")
+    public String attachPersonToBook(@PathVariable("id") int bookId,
+                                     @ModelAttribute("book") Book book,
+                                     Model model){
+        bookDAO.attachPersonToBook(book, bookId);
+        model.addAttribute("book", bookDAO.getBook(book.getId()));
+        model.addAttribute("people", personDAO.getPeople());
+        return "books/book";
+    }
+
+    @PatchMapping("/release/{id}")
+    public String releasePersonFromBook(@PathVariable("id") int personId,
+                                        @ModelAttribute("book") Book book,
+                                        Model model){
+        bookDAO.releasePersonFromBook(book, personId);
+        model.addAttribute("book", bookDAO.getBook(book.getId()));
+        model.addAttribute("people", personDAO.getPeople());
+        return "books/book";
     }
 }

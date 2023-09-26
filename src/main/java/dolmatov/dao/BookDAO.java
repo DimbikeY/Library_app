@@ -32,21 +32,27 @@ public class BookDAO {
     }
 
     public void editBook(Book book, int id) {
-        jdbcTemplate.update("UPDATE Book SET name=?, author=?, year=?, personId=? WHERE id=?",
+        jdbcTemplate.update("UPDATE Book SET name=?, author=?, year=? WHERE id=?",
                 book.getName(),
                 book.getAuthor(),
                 book.getYear(),
-                book.getPersonId(),
                 id);
     }
 
     public void deleteBook(int id, Book bookToDelete) {
         jdbcTemplate.update("DELETE FROM Book WHERE id=?",
-                bookToDelete.getId());
+                id);
     }
 
-    public void changePerson(int personId, int id) {
-        jdbcTemplate.update("UPDATE Books SET person_id=? WHERE id=?", personId, id);
+    public void attachPersonToBook(Book book, int bookId) {
+        jdbcTemplate.update("UPDATE Book SET person_id=? WHERE id=?", book.getPersonId(), bookId);
+    }
 
+    public void releasePersonFromBook(Book book, int personId) {
+        jdbcTemplate.update("UPDATE Book SET person_id=null WHERE id=?", book.getId());
+    }
+
+    public List<Book> getBookFromPerson(int id) {
+        return jdbcTemplate.query("SELECT * FROM Book WHERE person_id=?", new BookMapping(), id);
     }
 }
