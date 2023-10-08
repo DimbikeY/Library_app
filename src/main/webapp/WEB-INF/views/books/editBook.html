@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Edit a book</title>
 </head>
 <body>
-<form th:method="PATCH" th:action="@{/books/{id}(id=${book.getId() + 1})}" th:object="${book}">
+<form th:method="PATCH" th:action="@{/books/{id}(id=${book.getId()})}" th:object="${book}">
     <label for="nameId">Type a new name: </label>
     <input type="text" th:field="*{name}" id="nameId">
     <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">NAME ERROR</div>

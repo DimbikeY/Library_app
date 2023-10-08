@@ -1,65 +1,68 @@
 package dolmatov.controllers;
 
 import dolmatov.dao.BookDAO;
-import dolmatov.dao.PersonDAO;
 import dolmatov.models.Book;
-import dolmatov.models.Person;
-import jakarta.validation.Valid;
+import dolmatov.services.BooksService;
+import dolmatov.services.PeopleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/books")
 public class BookController {
-    private BookDAO bookDAO;
-    private PersonDAO personDAO;
+    private final BookDAO bookDAO;
+    private final BooksService booksService;
+    private final PeopleService peopleService;
+
     @Autowired
-    public BookController(BookDAO bookDAO, PersonDAO personDAO) {
+    public BookController(BookDAO bookDAO, BooksService booksService, PeopleService peopleService) {
         this.bookDAO = bookDAO;
-        this.personDAO = personDAO;
+        this.booksService = booksService;
+        this.peopleService = peopleService;
     }
 
     @GetMapping()
     public String getBooks(Model model){
-        // Идём через модель в dao -> запрос в SQL -> возрат и отправка в представление через атрибут модели
-        model.addAttribute("books", bookDAO.getBooks());
+        model.addAttribute("books", this.booksService.findAll());
+
         return "books/books";
     }
 
     @GetMapping("/{id}")
     public String getBook(@PathVariable("id") int id,
                           Model model){
-        // Получим одного через переменную пути -> запрос к БД -> засунем в модель и на представление
-        model.addAttribute("book", bookDAO.getBook(id));
-        model.addAttribute("people", personDAO.getPeople());
+        model.addAttribute("book", booksService.findById(id));
+        model.addAttribute("people", peopleService.findAll());
         return "books/book";
     }
 
     @GetMapping("/new")
     public String addBook(@ModelAttribute("book") Book book){
-        // вывод на html
+
         return "books/createBook";
     }
+
     @PostMapping()
     public String createBook(@ModelAttribute("book") @Valid Book book,
                              BindingResult bindingResult){
         if (bindingResult.hasErrors()){
             return "books/createBook";
         }
-        bookDAO.createBook(book);
+        booksService.save(book);
+
         return "redirect:/books";
     }
 
     @GetMapping("/{id}/edit")
     public String editBook(@PathVariable("id") int id,
                            Model model){
-        // Меняем данные пользователя
-        model.addAttribute("book", bookDAO.getBook(id));
+        model.addAttribute("book", booksService.findById(id));
+
         return "books/editBook";
     }
 
@@ -67,41 +70,36 @@ public class BookController {
     public String patchBook(@PathVariable("id") int id,
                             @ModelAttribute("book") @Valid Book book,
                             BindingResult bindingResult){
-        System.out.println(book.getId());
-        System.out.println(id);
-        // обращаюсь к БД после получения html формы от editPerson
         if(bindingResult.hasErrors()){
             return "books/editBook";
         }
-        bookDAO.editBook(book, id);
+        booksService.update(book, id);
+
         return "redirect:/books";
     }
 
     @DeleteMapping("/{id}")
     public String deleteBook(@PathVariable("id") int id,
                              @ModelAttribute("book") Book book){
-        // Обращаемся сразу к DAO
-        bookDAO.deleteBook(id, book);
+        if(booksService.checkBeforeDelete(id).isPresent()){
+            return "redirect:/books/{" + id + "}";
+        }
+        booksService.delete(book, id);
+
         return "redirect:/books";
     }
 
     @PatchMapping("/attach/{id}")
     public String attachPersonToBook(@PathVariable("id") int bookId,
-                                     @ModelAttribute("book") Book book,
-                                     Model model){
-        bookDAO.attachPersonToBook(book, bookId);
-        model.addAttribute("book", bookDAO.getBook(book.getId()));
-        model.addAttribute("people", personDAO.getPeople());
-        return "books/book";
+                                     @ModelAttribute("book") Book book){
+        booksService.attachPersonToBook(book, bookId);
+        return "redirect:/books/{" + bookId + "}";
     }
 
     @PatchMapping("/release/{id}")
-    public String releasePersonFromBook(@PathVariable("id") int personId,
-                                        @ModelAttribute("book") Book book,
-                                        Model model){
-        bookDAO.releasePersonFromBook(book, personId);
-        model.addAttribute("book", bookDAO.getBook(book.getId()));
-        model.addAttribute("people", personDAO.getPeople());
-        return "books/book";
+    public String releasePersonFromBook(@PathVariable("id") int bookId){
+        booksService.releasePersonFromBook(bookId);
+
+        return "redirect:/books/{" + bookId + "}";
     }
 }

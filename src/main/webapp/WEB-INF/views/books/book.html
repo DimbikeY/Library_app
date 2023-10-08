@@ -8,30 +8,20 @@
 <div th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}"/>
 <br/>
 <div th:switch="${book.getPersonId()}">
-    <div th:case="0">
-        <p> This book is completely free!</p>
-        <form th:method="PATCH" th:action="@{/books/attach/{id}(id=${book.getId()})}" th:object="${book}">
-            <input type="hidden" th:field="*{id}"/>
-            <input type="hidden" th:field="*{name}"/>
-            <input type="hidden" th:field="*{year}"/>
-            <input type="hidden" th:field="*{author}"/>
-            <!--<input type="hidden" th:field="*{personId}">-->
+    <div th:case="null">
+        <p>This book is completely free!</p>
+        <form th:method="PATCH" th:action="@{/books/attach/{id}(id=${book.getId()})}">
             <label for="bookLabel">Choose a person to give him a book: </label>
             <select th:object="${book}" th:field="*{personId}" id="bookLabel">
-                <option th:each="person: ${people}" th:value="${person.getId()}" th:text="${person.getName()}"/>
+                <option th:each="person: ${people}" th:value="${person}" th:text="${person.getName()}"/>
             </select>
             <br/>
             <input type="submit" value="Take a book to that person!">
         </form>
     </div>
     <div th:case="*">
-        <p>This book is taken by <span th:each="person : ${people}" th:if="${person.getId() == book.getPersonId()}"><span th:text="${person.getName()}">VALUE</span></span></p>
-        <form th:method="PATCH" th:action="@{/books/release/{id}(id=${book.getPersonId()})}" th:object="${book}">
-            <input type="hidden" th:field="*{id}" />
-            <input type="hidden" th:field="*{name}" />
-            <input type="hidden" th:field="*{year}" />
-            <input type="hidden" th:field="*{author}" />
-            <input type="hidden" th:field="*{personId}">
+        <p>This book is taken by <span th:text="${book.getPersonId().getName()}">VALUE</span></p>
+        <form th:method="PATCH" th:action="@{/books/release/{id}(id=${book.getId()})}" th:object="${book}">
             <input type="submit" value="Release that book from that person">
         </form>
     </div>
@@ -42,7 +32,6 @@
     <input type="submit" value="Edit this book!">
 </form>
 <br/>
-
 <form th:method="DELETE" th:action="@{/books/{id}(id=${book.getId()})}">
     <input type="submit" value="Delete this book!">
 </form>

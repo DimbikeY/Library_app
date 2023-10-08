@@ -8,22 +8,26 @@
 <div th:text="${person.getName() + ', ' + person.getYear()}"/>
 <br/>
 <br/>
-<div th:if="${bookFromPerson.isEmpty()}">
+<div th:if="${person.getBookList().isEmpty()}">
     This person hasn't taken any books!
 </div>
 <hr/>
-<div th:if="${bookFromPerson.size() > 0}">
+<div th:if="${person.getBookList().size() > 1}">
     <p>Books:</p>
-    <div th:each="book: ${bookFromPerson}">
+    <div th:each="book: ${person.getBookList()}">
         <span th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}">VALUE</span>
     </div>
+</div>
+<hr/>
+<div th:if="${person.getBookList().size() == 1}">
+    <p>Book: </p>
+    <span th:text="${person.getBookList().get(0)}">VALUE</span>
 </div>
 <hr/>
 <form method="GET" th:action="@{/people/{id}/edit(id=${person.getId()})}" th:object="${person}">
     <input type="submit" value="Edit this person!">
 </form>
 <br/>
-
 <form th:method="DELETE" th:action="@{/people/{id}(id=${person.getId()})}">
     <input type="submit" value="Delete this person!">
 </form>
