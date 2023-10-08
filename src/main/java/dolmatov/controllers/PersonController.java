@@ -1,71 +1,68 @@
 package dolmatov.controllers;
 
-import dolmatov.dao.BookDAO;
 import dolmatov.dao.PersonDAO;
 import dolmatov.models.Person;
+import dolmatov.services.PeopleService;
 import dolmatov.utils.PersonValidator;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Controller
 @RequestMapping("/people")
 public class PersonController {
-    private BookDAO bookDAO;
     private PersonDAO personDAO;
     private PersonValidator personValidator;
+    private PeopleService peopleService;
+
     @Autowired
-    public PersonController(PersonDAO personDAO, PersonValidator personValidator, BookDAO bookDAO) {
+    public PersonController(PersonDAO personDAO, PersonValidator personValidator, PeopleService peopleService) {
         this.personDAO = personDAO;
         this.personValidator = personValidator;
-        this.bookDAO = bookDAO;
+        this.peopleService = peopleService;
     }
 
     @GetMapping()
     public String getPeople(Model model){
-        // Всех
-        model.addAttribute("people", personDAO.getPeople());
+        model.addAttribute("people", peopleService.findAll());
+
         return "people/people";
     }
 
     @GetMapping("/{id}")
     public String getPerson(@PathVariable("id") int id,
                             Model model){
-        // Получим одного
-        model.addAttribute("person", personDAO.getPerson(id));
-        // model.addAttribute("books", bookDAO.getBooks());
-        model.addAttribute("bookFromPerson", bookDAO.getBookFromPerson(id));
-        System.out.println(bookDAO.getBookFromPerson(id).size());
+        model.addAttribute("person", peopleService.findById(id));
+
         return "people/person";
     }
 
     @GetMapping("/new")
     public String addPerson(@ModelAttribute("person") Person person) {
-        // вывод на html
-        return "people/createPerson";
 
+        return "people/createPerson";
     }
     @PostMapping()
     public String createPerson(@ModelAttribute("person") @Valid Person person,
                                BindingResult bindingResult){
         personValidator.validate(person, bindingResult);
-        // Реализовать, что делать, если он не меняет значение, но оно у него есть
         if(bindingResult.hasErrors()){
             return "people/createPerson";
         }
-        personDAO.addPerson(person);
-        return "redirect:/people";
+        peopleService.save(person);
 
+        return "redirect:/people";
     }
 
     @GetMapping("/{id}/edit")
     public String editPerson(@PathVariable("id") int id,
                              Model model){
-        // Меняем данные пользователя
-        model.addAttribute("person", personDAO.getPerson(id));
+        model.addAttribute("person", peopleService.findById(id));
+
         return "people/editPerson";
     }
 
@@ -73,20 +70,23 @@ public class PersonController {
     public String patchPerson(@PathVariable("id") int id,
                               @ModelAttribute("person") @Valid Person person,
                               BindingResult bindingResult) {
-        personValidator.validate(person, bindingResult);
-        // Реализовать, что делать, если не изменяем вальдируемое на уникальность поле, на которое триггерится валидатор
+        personValidator.validate(person, bindingResult, id);
         if(bindingResult.hasErrors()){
-            return "people/editPerson";
+            return "redirect:/people/editPerson";
         }
-        personDAO.editPerson(person, id);
+        peopleService.update(person, id);
+
         return "redirect:/people";
     }
 
     @DeleteMapping("/{id}")
     public String deletePerson(@PathVariable("id") int id,
                                @ModelAttribute("person") Person person){
-        // Обращаемся сразу к DAO
-        personDAO.deletePerson(id, person);
+        if(peopleService.checkBeforeDelete(id).isPresent()){
+            return "redirect:/people/{" + id + "}";
+        }
+        peopleService.delete(person, id);
+
         return "redirect:/people";
     }
 

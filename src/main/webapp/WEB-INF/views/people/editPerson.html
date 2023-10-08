@@ -10,7 +10,7 @@
     <input type="text" th:field="*{name}" id="nameId">
     <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">NAME ERROR</div>
     <br/>
-    <label for="yearId">Type a new year: </label>
+    <label for="yearId">Type a year of your birth: </label>
     <input type="text" th:field="*{year}" id="yearId">
     <div style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}">YEAR ERROR</div>
     <br/>
