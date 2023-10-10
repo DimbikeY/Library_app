@@ -83,7 +83,7 @@ public class PersonController {
     public String deletePerson(@PathVariable("id") int id,
                                @ModelAttribute("person") Person person){
         if(peopleService.checkBeforeDelete(id).isPresent()){
-            return "redirect:/people/{" + id + "}";
+            return "redirect:/people/   " + id;
         }
         peopleService.delete(person, id);
 
