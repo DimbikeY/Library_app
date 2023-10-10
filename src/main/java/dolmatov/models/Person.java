@@ -29,8 +29,7 @@ public class Person {
     public Person() {
     }
 
-    public Person(int id, int year, String name) {
-        this.id = id;
+    public Person(int year, String name) {
         this.year = year;
         this.name = name;
     }

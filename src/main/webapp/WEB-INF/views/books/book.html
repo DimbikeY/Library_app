@@ -12,11 +12,10 @@
         <p>This book is completely free!</p>
         <form th:method="PATCH" th:action="@{/books/attach/{id}(id=${book.getId()})}">
             <label for="bookLabel">Choose a person to give him a book: </label>
-            <select th:object="${book}" th:field="*{personId}" id="bookLabel">
-                <option th:each="person: ${people}" th:value="${person}" th:text="${person.getName()}"/>
+            <select th:object="${book}" th:field="*{personId.id}" id="bookLabel">
+                <option th:each="person: ${people}" th:value="${person.id}" th:text="${person.getName()}">VALUE</option>
             </select>
-            <br/>
-            <input type="submit" value="Take a book to that person!">
+            <input type="submit" value="Take a book to that person!"/>
         </form>
     </div>
     <div th:case="*">

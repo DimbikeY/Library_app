@@ -1,6 +1,5 @@
 package dolmatov.controllers;
 
-import dolmatov.dao.BookDAO;
 import dolmatov.models.Book;
 import dolmatov.services.BooksService;
 import dolmatov.services.PeopleService;
@@ -15,20 +14,19 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/books")
 public class BookController {
-    private final BookDAO bookDAO;
+
     private final BooksService booksService;
     private final PeopleService peopleService;
 
     @Autowired
-    public BookController(BookDAO bookDAO, BooksService booksService, PeopleService peopleService) {
-        this.bookDAO = bookDAO;
+    public BookController(BooksService booksService, PeopleService peopleService) {
         this.booksService = booksService;
         this.peopleService = peopleService;
     }
 
     @GetMapping()
     public String getBooks(Model model){
-        model.addAttribute("books", this.booksService.findAll());
+        model.addAttribute("books", booksService.findAll());
 
         return "books/books";
     }
@@ -38,6 +36,7 @@ public class BookController {
                           Model model){
         model.addAttribute("book", booksService.findById(id));
         model.addAttribute("people", peopleService.findAll());
+
         return "books/book";
     }
 
@@ -71,6 +70,7 @@ public class BookController {
                             @ModelAttribute("book") @Valid Book book,
                             BindingResult bindingResult){
         if(bindingResult.hasErrors()){
+
             return "books/editBook";
         }
         booksService.update(book, id);
@@ -82,7 +82,8 @@ public class BookController {
     public String deleteBook(@PathVariable("id") int id,
                              @ModelAttribute("book") Book book){
         if(booksService.checkBeforeDelete(id).isPresent()){
-            return "redirect:/books/{" + id + "}";
+
+            return "redirect:/books/" + id ;
         }
         booksService.delete(book, id);
 
@@ -90,16 +91,18 @@ public class BookController {
     }
 
     @PatchMapping("/attach/{id}")
-    public String attachPersonToBook(@PathVariable("id") int bookId,
+    public String attachPersonToBook(@PathVariable("id") int id,
                                      @ModelAttribute("book") Book book){
-        booksService.attachPersonToBook(book, bookId);
-        return "redirect:/books/{" + bookId + "}";
+        System.out.println("Before attach");
+        booksService.attachPersonToBook(book, id);
+
+        return "redirect:/books/" + id;
     }
 
     @PatchMapping("/release/{id}")
-    public String releasePersonFromBook(@PathVariable("id") int bookId){
-        booksService.releasePersonFromBook(bookId);
+    public String releasePersonFromBook(@PathVariable("id") int id){
+        booksService.releasePersonFromBook(id);
 
-        return "redirect:/books/{" + bookId + "}";
+        return "redirect:/books/" + id;
     }
 }

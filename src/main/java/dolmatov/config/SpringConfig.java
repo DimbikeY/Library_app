@@ -37,6 +37,11 @@ public class SpringConfig implements WebMvcConfigurer {
     private final ApplicationContext applicationContext;
     private final Environment env;
 
+    @Autowired
+    public SpringConfig(ApplicationContext applicationContext, Environment environment) {
+        this.applicationContext = applicationContext;
+        this.env = environment;
+    }
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
@@ -46,18 +51,13 @@ public class SpringConfig implements WebMvcConfigurer {
         return messageSource;
     }
 
-    @Autowired
-    public SpringConfig(ApplicationContext applicationContext, Environment environment) {
-        this.applicationContext = applicationContext;
-        this.env = environment;
-    }
-
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
         templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding("UTF-8");
 
         return templateResolver;
     }
@@ -81,6 +81,7 @@ public class SpringConfig implements WebMvcConfigurer {
     @Bean
     public DataSource dataSource(){
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
+
         dataSource.setDriverClassName(env.getRequiredProperty("hibernate.driver_class"));
         dataSource.setUrl(env.getRequiredProperty("hibernate.connection.url"));
         dataSource.setUsername(env.getRequiredProperty("hibernate.connection.username"));
