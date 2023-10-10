@@ -25,8 +25,12 @@ public class BookController {
     }
 
     @GetMapping()
-    public String getBooks(Model model){
-        model.addAttribute("books", booksService.findAll());
+    public String getBooks(@RequestParam(value = "page", required = false, defaultValue = "0") String page,
+                            @RequestParam(value = "books_per_page", required = false, defaultValue = "0") String booksPerPage,
+                            @RequestParam(value = "sort_by_year", required = false, defaultValue = "false") String isSorted,
+                            Model model){
+        model.addAttribute("books", booksService.findAll(page, booksPerPage, isSorted));
+
 
         return "books/books";
     }
@@ -38,6 +42,21 @@ public class BookController {
         model.addAttribute("people", peopleService.findAll());
 
         return "books/book";
+    }
+    @GetMapping("/search")
+    public String doSearch(Model model){
+        model.addAttribute("book", new Book());
+
+        return "books/search";
+    }
+
+    @PostMapping("/search")
+    public String doResult(@ModelAttribute("book") Book book,
+                           Model model){
+        Book bookToCheck = booksService.checkIfExist(book.getTitle());
+        model.addAttribute("book", bookToCheck);
+
+        return "books/search";
     }
 
     @GetMapping("/new")
@@ -93,7 +112,6 @@ public class BookController {
     @PatchMapping("/attach/{id}")
     public String attachPersonToBook(@PathVariable("id") int id,
                                      @ModelAttribute("book") Book book){
-        System.out.println("Before attach");
         booksService.attachPersonToBook(book, id);
 
         return "redirect:/books/" + id;

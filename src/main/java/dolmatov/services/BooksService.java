@@ -7,6 +7,8 @@ import dolmatov.repositories.BooksRepository;
 import dolmatov.repositories.PeopleRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,27 @@ public class BooksService {
     }
 
     @Transactional(readOnly = true)
+    public List<Book> findAll(String page, String booksPerPage, String isSorted) {
+        boolean sort = Boolean.parseBoolean(isSorted);
+        int pageNum = Integer.parseInt(page);
+        int booksAPage = Integer.parseInt(booksPerPage);
+        List<Book> bookList;
+        if(booksAPage == 0){
+            if(sort){
+                bookList = booksRepository.findAll(Sort.by("year"));
+            }else {
+                bookList = booksRepository.findAll();
+            }
+        } else if (sort) {
+            bookList = booksRepository.findAll(PageRequest.of(pageNum, booksAPage, Sort.by("year"))).getContent();
+        }else{
+            bookList = booksRepository.findAll(PageRequest.of(pageNum, booksAPage)).getContent();
+        }
+
+        return bookList;
+    }
+
+    @Transactional(readOnly = true)
     public Book findById(int id){
         Book book = booksRepository.findById(id);
         Hibernate.initialize(book.getPersonId());
@@ -46,7 +69,7 @@ public class BooksService {
     @Transactional
     public void update(Book book, int id) {
         Book bookToUpdate = booksRepository.findById(id);
-        bookToUpdate.setName(book.getName());
+        bookToUpdate.setTitle(book.getTitle());
         bookToUpdate.setAuthor(book.getAuthor());
         bookToUpdate.setYear(book.getYear());
         booksRepository.save(bookToUpdate);
@@ -64,9 +87,11 @@ public class BooksService {
         Person personToAttach = peopleRepository.findById(book.getPersonId().getId());
         bookToAttach.setPersonId(personToAttach);
 
-        // for local cash
+        // a reverse action for local cache
         if(personToAttach.getBookList().isEmpty()){
             personToAttach.setBookList(new ArrayList<>(Collections.singletonList(bookToAttach)));
+        }else{
+            personToAttach.getBookList().add(bookToAttach);
         }
         //
         booksRepository.save(bookToAttach);
@@ -75,18 +100,23 @@ public class BooksService {
     @Transactional
     public void releasePersonFromBook(int bookId) {
         Book bookToRelease = booksRepository.findById(bookId);
-        bookToRelease.setPersonId(null);
 
-        // for local cash
-            bookToRelease.getPersonId().getBookList().remove(bookToRelease);
+        // a reverse action for local cache
+        bookToRelease.getPersonId().getBookList().remove(bookToRelease);
         //
-
+        bookToRelease.setPersonId(null);
         booksRepository.save(bookToRelease);
     }
-    @Transactional
+
+    @Transactional(readOnly = true)
     public Optional<Person> checkBeforeDelete(int id) {
         Book bookToCheck = booksRepository.findById(id);
 
         return Optional.ofNullable(bookToCheck.getPersonId());
+    }
+
+    @Transactional(readOnly = true)
+    public Book checkIfExist(String title) {
+        return booksRepository.findByTitleStartingWith(title);
     }
 }

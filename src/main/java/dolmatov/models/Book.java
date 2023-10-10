@@ -13,9 +13,9 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "name")
+    @Column(name = "title")
     @NotEmpty(message = "You name should have consisted of >0 characters")
-    private String name;
+    private String title;
     @Column(name = "author")
     @NotEmpty(message = "You name is empty")
     private String author;
@@ -35,8 +35,8 @@ public class Book {
     public Book(){
     }
 
-    public Book(String name, String author, int year) {
-        this.name = name;
+    public Book(String title, String author, int year) {
+        this.title = title;
         this.author = author;
         this.year = year;
     }
@@ -49,12 +49,12 @@ public class Book {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String name) {
+        this.title = name;
     }
 
     public String getAuthor() {

@@ -15,7 +15,7 @@
 <div th:if="${person.getBookList().size() > 1}">
     <p>Books:</p>
     <div th:each="book: ${person.getBookList()}">
-        <span th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}">VALUE</span>
+        <span th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYear()}">VALUE</span>
     </div>
 </div>
 <hr/>

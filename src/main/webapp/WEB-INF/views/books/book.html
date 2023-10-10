@@ -5,7 +5,7 @@
     <title>Book info</title>
 </head>
 <body>
-<div th:text="${book.getName() + ', ' + book.getAuthor() + ', ' + book.getYear()}"/>
+<div th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYear()}"/>
 <br/>
 <div th:switch="${book.getPersonId()}">
     <div th:case="null">
