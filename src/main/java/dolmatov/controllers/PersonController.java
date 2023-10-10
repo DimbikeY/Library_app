@@ -1,6 +1,5 @@
 package dolmatov.controllers;
 
-import dolmatov.dao.PersonDAO;
 import dolmatov.models.Person;
 import dolmatov.services.PeopleService;
 import dolmatov.utils.PersonValidator;
@@ -15,13 +14,11 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/people")
 public class PersonController {
-    private PersonDAO personDAO;
     private PersonValidator personValidator;
     private PeopleService peopleService;
 
     @Autowired
-    public PersonController(PersonDAO personDAO, PersonValidator personValidator, PeopleService peopleService) {
-        this.personDAO = personDAO;
+    public PersonController(PersonValidator personValidator, PeopleService peopleService) {
         this.personValidator = personValidator;
         this.peopleService = peopleService;
     }
@@ -46,6 +43,7 @@ public class PersonController {
 
         return "people/createPerson";
     }
+
     @PostMapping()
     public String createPerson(@ModelAttribute("person") @Valid Person person,
                                BindingResult bindingResult){
