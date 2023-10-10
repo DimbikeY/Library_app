@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/books")
@@ -53,8 +54,8 @@ public class BookController {
     @PostMapping("/search")
     public String doResult(@ModelAttribute("book") Book book,
                            Model model){
-        Book bookToCheck = booksService.checkIfExist(book.getTitle());
-        model.addAttribute("book", bookToCheck);
+        List<Book> booksToCheck = booksService.searchToBooks(book.getTitle());
+        model.addAttribute("books", booksToCheck);
 
         return "books/search";
     }

@@ -116,7 +116,14 @@ public class BooksService {
     }
 
     @Transactional(readOnly = true)
-    public Book checkIfExist(String title) {
-        return booksRepository.findByTitleStartingWith(title);
+    public List<Book> searchToBooks(String title) {
+        List<Book> bookList = booksRepository.findByTitleStartingWithIgnoreCase(title);
+        for(Book book: bookList){
+            if(book.getPersonId() != null){
+                Hibernate.initialize(book.getPersonId().getName());
+            }
+        }
+
+        return bookList;
     }
 }
