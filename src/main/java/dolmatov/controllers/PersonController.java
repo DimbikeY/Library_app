@@ -14,8 +14,8 @@ import javax.validation.Valid;
 @Controller
 @RequestMapping("/people")
 public class PersonController {
-    private PersonValidator personValidator;
-    private PeopleService peopleService;
+    private final PersonValidator personValidator;
+    private final PeopleService peopleService;
 
     @Autowired
     public PersonController(PersonValidator personValidator, PeopleService peopleService) {
@@ -81,7 +81,7 @@ public class PersonController {
     public String deletePerson(@PathVariable("id") int id,
                                @ModelAttribute("person") Person person){
         if(peopleService.checkBeforeDelete(id).isPresent()){
-            return "redirect:/people/   " + id;
+            return "redirect:/people/" + id;
         }
         peopleService.delete(person, id);
 

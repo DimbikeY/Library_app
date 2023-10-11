@@ -94,6 +94,7 @@ public class BooksService {
             personToAttach.getBookList().add(bookToAttach);
         }
         //
+        bookToAttach.setTimeAt();
         booksRepository.save(bookToAttach);
     }
 
@@ -105,6 +106,11 @@ public class BooksService {
         bookToRelease.getPersonId().getBookList().remove(bookToRelease);
         //
         bookToRelease.setPersonId(null);
+        if(bookToRelease.isExpired()){
+            bookToRelease.setExpired(false);
+        }
+
+        bookToRelease.releaseTimeAt();
         booksRepository.save(bookToRelease);
     }
 

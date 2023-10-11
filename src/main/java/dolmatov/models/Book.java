@@ -85,8 +85,12 @@ public class Book {
         return timeAt;
     }
 
-    public void setTimeAt(int daysTaken) {
-        new Date();
+    public void setTimeAt() {
+        timeAt = new Date();
+    }
+
+    public void releaseTimeAt(){
+        this.timeAt = null;
     }
 
     public boolean isExpired() {

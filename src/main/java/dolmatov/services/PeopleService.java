@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,9 +32,25 @@ public class PeopleService {
     @Transactional(readOnly = true)
     public Person findById(int id){
         Person person = peopleRepository.findById(id);
-        Hibernate.initialize(person.getBookList());
+
+        List<Book> booksList = person.getBookList();
+        for(Book book: booksList){
+            if(book.getPersonId() != null){
+                Hibernate.initialize(book.getPersonId());
+                checkExpiredBack(book);
+            }
+        }
 
         return person;
+    }
+
+    private static void checkExpiredBack(Book book) {
+        Instant currentTime = Instant.now();
+        Instant takenTime = book.getTimeAt().toInstant();
+        Duration duration = Duration.between(takenTime, currentTime);
+        if(duration.toDays() > 10){
+            book.setExpired(true);
+        }
     }
 
     @Transactional
@@ -47,6 +65,7 @@ public class PeopleService {
         personToUpdate.setYear(person.getYear());
         peopleRepository.save(personToUpdate);
     }
+
     @Transactional
     public void delete(Person person, int id) {
         Person personToDelete = peopleRepository.findById(id);
