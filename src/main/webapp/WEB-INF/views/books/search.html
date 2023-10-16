@@ -7,7 +7,7 @@
 <body>
 <form th:method="POST" th:action="@{/books/search}" th:object="${book}">
       <label for="label">Write a query:</label>
-      <input type="text" th:field="*{title}" id="label">
+      <input type="text" name="query" id="label">
       <br/>
       <input type="submit" value="Create a query">
 </form>

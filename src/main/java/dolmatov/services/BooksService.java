@@ -33,21 +33,18 @@ public class BooksService {
     }
 
     @Transactional(readOnly = true)
-    public List<Book> findAll(String page, String booksPerPage, String isSorted) {
-        boolean sort = Boolean.parseBoolean(isSorted);
-        int pageNum = Integer.parseInt(page);
-        int booksAPage = Integer.parseInt(booksPerPage);
+    public List<Book> findAll(int page, int booksPerPage, boolean isSorted) {
         List<Book> bookList;
-        if(booksAPage == 0){
-            if(sort){
+        if(booksPerPage == 0){
+            if(isSorted){
                 bookList = booksRepository.findAll(Sort.by("year"));
             }else {
                 bookList = booksRepository.findAll();
             }
-        } else if (sort) {
-            bookList = booksRepository.findAll(PageRequest.of(pageNum, booksAPage, Sort.by("year"))).getContent();
+        } else if (isSorted) {
+            bookList = booksRepository.findAll(PageRequest.of(page, booksPerPage, Sort.by("year"))).getContent();
         }else{
-            bookList = booksRepository.findAll(PageRequest.of(pageNum, booksAPage)).getContent();
+            bookList = booksRepository.findAll(PageRequest.of(page, booksPerPage)).getContent();
         }
 
         return bookList;
@@ -72,7 +69,6 @@ public class BooksService {
         bookToUpdate.setTitle(book.getTitle());
         bookToUpdate.setAuthor(book.getAuthor());
         bookToUpdate.setYear(book.getYear());
-        booksRepository.save(bookToUpdate);
     }
 
     @Transactional
@@ -95,7 +91,6 @@ public class BooksService {
         }
         //
         bookToAttach.setTimeAt();
-        booksRepository.save(bookToAttach);
     }
 
     @Transactional
@@ -111,7 +106,6 @@ public class BooksService {
         }
 
         bookToRelease.releaseTimeAt();
-        booksRepository.save(bookToRelease);
     }
 
     @Transactional(readOnly = true)
@@ -121,8 +115,8 @@ public class BooksService {
         return Optional.ofNullable(bookToCheck.getPersonId());
     }
 
-    @Transactional(readOnly = true)
-    public List<Book> searchToBooks(String title) {
+    @Transactional
+    public List<Book> findByTitleStartingWith(String title) {
         List<Book> bookList = booksRepository.findByTitleStartingWithIgnoreCase(title);
         for(Book book: bookList){
             if(book.getPersonId() != null){

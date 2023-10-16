@@ -26,9 +26,9 @@ public class BookController {
     }
 
     @GetMapping()
-    public String getBooks(@RequestParam(value = "page", required = false, defaultValue = "0") String page,
-                            @RequestParam(value = "books_per_page", required = false, defaultValue = "0") String booksPerPage,
-                            @RequestParam(value = "sort_by_year", required = false, defaultValue = "false") String isSorted,
+    public String getBooks(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                            @RequestParam(value = "books_per_page", required = false, defaultValue = "0") int booksPerPage,
+                            @RequestParam(value = "sort_by_year", required = false, defaultValue = "false") boolean isSorted,
                             Model model){
         model.addAttribute("books", booksService.findAll(page, booksPerPage, isSorted));
 
@@ -52,9 +52,9 @@ public class BookController {
     }
 
     @PostMapping("/search")
-    public String doResult(@ModelAttribute("book") Book book,
+    public String doResult(@RequestParam("query") String query,
                            Model model){
-        List<Book> booksToCheck = booksService.searchToBooks(book.getTitle());
+        List<Book> booksToCheck = booksService.findByTitleStartingWith(query);
         model.addAttribute("books", booksToCheck);
 
         return "books/search";

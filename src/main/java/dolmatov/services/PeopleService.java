@@ -2,6 +2,7 @@ package dolmatov.services;
 
 import dolmatov.models.Book;
 import dolmatov.models.Person;
+import dolmatov.repositories.BooksRepository;
 import dolmatov.repositories.PeopleRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import java.util.Optional;
 @Service
 public class PeopleService {
     private final PeopleRepository peopleRepository;
+    private final BooksRepository booksRepository;
 
     @Autowired
-    public PeopleService(PeopleRepository peopleRepository){
+    public PeopleService(PeopleRepository peopleRepository, BooksRepository booksRepository){
         this.peopleRepository = peopleRepository;
+        this.booksRepository = booksRepository;
     }
 
     @Transactional(readOnly = true)
@@ -38,6 +41,7 @@ public class PeopleService {
             if(book.getPersonId() != null){
                 Hibernate.initialize(book.getPersonId());
                 checkExpiredBack(book);
+                booksRepository.save(book);
             }
         }
 
@@ -63,7 +67,6 @@ public class PeopleService {
         Person personToUpdate = peopleRepository.findById(id);
         personToUpdate.setName(person.getName());
         personToUpdate.setYear(person.getYear());
-        peopleRepository.save(personToUpdate);
     }
 
     @Transactional
